@@ -86,6 +86,7 @@ def dashboard():
         flash("Invalid Login")
         return redirect('/')
     print("login info is:", session['user_id'])
+
     db=connectToMySQL("first_flask_mysql")
     query="SELECT first_name from user_info WHERE id = %(id)s;"
     data ={
@@ -96,13 +97,39 @@ def dashboard():
 
 
     db=connectToMySQL("first_flask_mysql")
-    query="SELECT topic, content, messages.created_at, user_info.first_name AS sender, r.first_name AS receiver FROM user_info JOIN messages ON user_info.id=messages.sender_id JOIN user_info AS r ON messages.receip_id=r.id WHERE r.id= %(id)s;"
+    query="SELECT messages.id AS messageid, topic, content, messages.created_at, user_info.first_name AS sender, r.first_name AS receiver FROM user_info JOIN messages ON user_info.id=messages.sender_id JOIN user_info AS r ON messages.receip_id=r.id WHERE r.id= %(id)s ORDER BY messages.created_at DESC;" #shows messages from others to receip id
     data={
         "id": session["user_id"]
     }
     receip_info=db.query_db(query, data)
-    print("messages for Kobe:", receip_info)
-    return render_template("dashboard.html", rinfo=receip_info, info=user_info)
+
+
+    sender_info=connectToMySQL("first_flask_mysql").query_db("SELECT id, first_name FROM user_info WHERE id != %(id)s", data={"id":session["user_id"]}) #shows all users not with the login id
+    print (sender_info)
+    return render_template("dashboard.html", rinfo=receip_info, info=user_info, sinfo=sender_info)
+
+@app.route('/post', methods=["POST"])
+def post():
+    db=connectToMySQL("first_flask_mysql")
+    query="INSERT INTO messages (topic, content, sender_id, receip_id) VALUES (%(topic)s,%(content)s,%(sid)s,%(rid)s);" #insert new message into table, getting sent to specific person
+    data = {
+        "topic": request.form["topic"],
+        "content": request.form["content"],
+        "sid": session["user_id"],
+        "rid": request.form["receiver"]
+    }
+    db.query_db(query, data) #gives me message id
+    return redirect("/dashboard")
+
+@app.route('/delete', methods=["POST"])
+def delete():
+    db=connectToMySQL("first_flask_mysql")
+    query="DELETE FROM messages WHERE messages.id=%(mi)s"
+    data={
+        "mi": request.form['message_id']
+    }
+    db.query_db(query, data)
+    return redirect('/dashboard')
 
 @app.route('/logout')
 def logout():

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<style>
+        h1{
+            display: inline-block;
+        }
+        .header{
+    
+            border-bottom: 2px solid lightblue;
+        }
+        #subheader{
+            display: inline-block;
+            margin-left: 500px;
+        }
+        a{
+            display: inline-block;
+        }
+        .card{
+            display: inline-block;
+        }
+        .divider{
+            width: 50px;
+            display: inline-block;
+        }
+        .align{
+            margin-left: 19px;
+        }
+        #send{
+            vertical-align: top;
+        }
+    </style>
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        {% for infos in info %}
+        <span class="navbar-brand mb-0 h1">CodingDojo Wall <h3 id="subheader">Welcome, {{infos ['first_name'] }}|<a class="btn btn-secondary btn-sm" href="/logout">Log Out</a></h3></span>
+        {% endfor %}
+    </nav>
+    <div class="header">
+        
+    </div>
+        <div class="card col-8" style="width: 35rem;">
+            <div class="card-body">
+                {% for stuff in rinfo %}
+                <h5 class="card-title"># Message(s) for You</h5>
+            </div>
+            <div>
+                    <p>Topic: {{stuff ['topic'] }}</p>
+                    <p>Content: {{stuff ['content'] }}</p>
+                    <p>Sent Fom: {{stuff ['sender'] }}</p>
+                    <p>Sent On: {{stuff ['created_at'] }}</p>
+                    <hr>
+                {% endfor %}
+
+            </div>    
+        </div>
+        <div class="divider">
+    
+        </div>
+        <div class="card col-8" id="send" style="width: 35rem;">
+            <div class="card-body">
+                <h5 class="card-title">Send Messages</h5>
+                <form action="/post" method="POST">
+                    <p >Topic: <textarea class="align"name="topic" cols="40" rows="1"></textarea></p>
+                    <p>Content: <textarea name="content" cols="40" rows="4"></textarea></p>
+                    <button>Post!</button>
+                </form>
+            </div>
+        </div>
+</body>
+</html>
